@@ -6,11 +6,7 @@ import swaggerDocument from './swagger-output.json';
 import userRoutes from "./routes/users.routes.js";
 import notesRoutes from "./routes/notes.routes.js";
 import staticRoutes from "./routes/static.routes.js";
-import authRoutes from "./routes/auth.js"; // Import your authentication routes
-
-const app = express();
-
-// SET TEMPLATE ENGINE AS EJS
+import authRoutes from "./routes/authRoutes.js";
 app.set("view engine", "ejs");
 
 // MIDDLEWARES
