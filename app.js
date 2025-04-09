@@ -1,4 +1,3 @@
-// app.js
 import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
@@ -25,14 +24,14 @@ app.use("/", staticRoutes);
 app.use("/users", (req, res, next) => {
   console.log("Handling request under /users - From app.js");
   next();
-
-  // In app.js
-app.get('/test', (req, res) => {
-  res.send('Test route is working!');
-});
 }, userRoutes);
 app.use("/notes", notesRoutes);
 app.use("/auth", authRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// Test route (moved outside the /users middleware)
+app.get('/test', (req, res) => {
+  res.send('Test route is working!');
+});
 
 export { app };
