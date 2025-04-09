@@ -1,20 +1,18 @@
 import jwt from "jsonwebtoken";
 
-export const setAuthStatus = (req, res, next) => {
+export const authenticated = (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
-    req.isAuthenticated = false;
-    return next();
+    return res.redirect("/sign-in");
   }
 
   jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
     if (err) {
-      req.isAuthenticated = false;
-      return next();
+      return res.redirect("/sign-in");
     }
 
-    req.isAuthenticated = true;
+    req.user = user;
     next();
   });
 };

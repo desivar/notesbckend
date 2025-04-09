@@ -1,22 +1,52 @@
-// server.js (or index.js - whichever you prefer as your main server file)
+import express from 'express';
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import cookieParser from 'cookie-parser';
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocument from './swagger-output.json' with { type: 'json' };
+import userRoutes from './routes/users.routes.js';
+import notesRoutes from './routes/notes.routes.js';
+import staticRoutes from './routes/static.routes.js';
+import authRoutes from './routes/authRoutes.js';
+import { signin } from './controllers/authController.js'; // TEMPORARY IMPORT for direct test
+import path from 'path'; // Ensure 'path' is imported
 
-import dotenv from "dotenv";
-import { connectDB } from "./config/db.js"; // Assuming your database connection logic is in this file
-import { app } from "./app.js"; // Assuming your Express app configuration is in app.js
+dotenv.config();
 
-// .ENV CONFIG
-dotenv.config({
-  path: "./.env",
+const app = express();
+const port = process.env.PORT || 5500;
+
+// Set template engine
+app.set("view engine", "ejs");
+
+// Middlewares (order matters)
+app.use(express.static(path.resolve("public")));
+app.use(express.json({ limit: "16kb" }));
+app.use(express.urlencoded({ extended: true, limit: "16kb" }));
+app.use(cookieParser());
+
+// Route mounting
+app.use("/", staticRoutes);
+app.use("/users", (req, res, next) => {
+  console.log("Handling request under /users - Consolidated server.js");
+  next();
+}, userRoutes);
+app.use("/notes", notesRoutes);
+app.use("/auth", authRoutes);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// TEMPORARY TEST ROUTE (for consolidated server.js)
+app.post('/test-signin', async (req, res) => {
+  console.log("Hit the /test-signin route - Consolidated server.js");
+  await signin(req, res);
+  console.log("Finished executing signin function - Consolidated server.js");
 });
-console.log("JWT_SECRET from env:", process.env.JWT_SECRET);
 
-const PORT = process.env.PORT || 5500;
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log(' MongoDB connected !! DB HOST:', mongoose.connection.host))
+  .catch((err) => console.error(' MongoDB connection error:', err));
 
-// CONNECTION WITH DATABASE & RUN SERVER
-connectDB()
-  .then(() => {
-    app.listen(PORT, () => console.log(`Server running at port: ${PORT}`));
-  })
-  .catch((err) => {
-    console.log("MongoDB connection failed !!! ", err);
-  });
+app.listen(port, () => {
+  console.log('Server running at port:', port);
+});
