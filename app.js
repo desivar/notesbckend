@@ -30,10 +30,12 @@ app.use("/auth", authRoutes); // Use the correctly imported authRoutes
 
 // TEMPORARY ROUTE FOR TESTING SIGNIN LOGS
 app.post('/test-signin', async (req, res) => {
+  console.log("Hit the /test-signin route"); // ADDED LOG
   await signin(req, res);
+  console.log("Finished executing signin function"); // ADDED LOG
 });
 
 // Swagger UI setup
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-export { app }; // Export 'app' after it has been defined
+export { app };
