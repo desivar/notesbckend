@@ -8,12 +8,10 @@ import {
   handleRenderEditNote,
 } from "../controllers/notes.controllers.js";
 import { authenticated } from "../middlewares/authenticated.js";
-import { setAuthStatus } from "../middlewares/setAuthStatus.js";
 
-const router = express.Router();
 
 // GET ALL NOTES        /notes
-router.get("/", authenticated, setAuthStatus, handleGetAllNotes);
+//router.get("/", authenticated, setAuthStatus, handleGetAllNotes);
 
 // CREATE NEW NOTES     /notes/create
 router.post("/create", authenticated, handleCreateNote);
