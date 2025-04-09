@@ -1,6 +1,8 @@
+// server.js (or index.js - whichever you prefer as your main server file)
+
 import dotenv from "dotenv";
-import { connectDB } from "./db/db.js";
-import { app } from "./app.js";
+import { connectDB } from "./config/db.js"; // Assuming your database connection logic is in this file
+import { app } from "./app.js"; // Assuming your Express app configuration is in app.js
 
 // .ENV CONFIG
 dotenv.config({
