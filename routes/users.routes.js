@@ -1,9 +1,11 @@
 import express from "express";
 import {
   handleUserLogout,
-  handleUserSignin,
   handleUserSignup,
 } from "../controllers/users.controllers.js";
+import {
+  signin as handleUserSignin // Import the signin function from authController and alias it
+} from "../controllers/authController.js";
 
 const router = express.Router();
 
