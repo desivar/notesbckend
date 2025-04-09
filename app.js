@@ -2,11 +2,11 @@ import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import swaggerUi from 'swagger-ui-express';
-import swaggerDocument from './swagger-output.json';
+import swaggerDocument from './swagger-output.json' with { type: 'json' }; // Ensure you have this import attribute
 import userRoutes from "./routes/users.routes.js";
 import notesRoutes from "./routes/notes.routes.js";
 import staticRoutes from "./routes/static.routes.js";
-import authRoutes from "./routes/authRoutes.js"; // Corrected import
+import authRoutes from "./routes/authRoutes.js";
 
 const app = express(); // Declare and initialize 'app'
 
