@@ -25,6 +25,11 @@ app.use("/", staticRoutes);
 app.use("/users", (req, res, next) => {
   console.log("Handling request under /users - From app.js");
   next();
+
+  // In app.js
+app.get('/test', (req, res) => {
+  res.send('Test route is working!');
+});
 }, userRoutes);
 app.use("/notes", notesRoutes);
 app.use("/auth", authRoutes);
