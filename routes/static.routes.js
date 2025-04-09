@@ -4,7 +4,10 @@ import { authenticated } from "../middlewares/authenticated.js";
 
 const router = express.Router();
 
-
+// RENDER HOME PAGE TO "/" ROOT PATH
+router.get("/", async (req, res) => {
+  res.render("home", { authenticated: req.isAuthenticated });
+});
 
 // RENDER SIGN-IN PAGE TO "/sign-in" PATH
 router.get("/sign-in", (req, res) => {
