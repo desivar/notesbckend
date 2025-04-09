@@ -78,9 +78,9 @@ export const signout = (req, res) => {
     res.status(StatusCodes.OK).json({ message: 'Logged out successfully' });
 };
 
-// Helper function to generate JWT
 const generateToken = (id) => {
+    console.log("JWT Secret:", process.env.JWT_SECRET); // Add this line
     return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: '30d', // Example expiration
+      expiresIn: '30d', // Example expiration
     });
-};
+  };
