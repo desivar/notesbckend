@@ -7,35 +7,24 @@ import userRoutes from "./routes/users.routes.js";
 import notesRoutes from "./routes/notes.routes.js";
 import staticRoutes from "./routes/static.routes.js";
 import authRoutes from "./routes/authRoutes.js";
-import { signin } from './controllers/authController.js'; // TEMPORARY IMPORT
 
-const app = express(); // Declare and initialize 'app'
+const app = express();
 
-// SET TEMPLATE ENGINE AS EJS
 app.set("view engine", "ejs");
-
-// MIDDLEWARES
 app.use(express.static(path.resolve("public")));
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
 
-// ROUTES IMPORTS
+// Explicitly log when userRoutes are mounted
+app.use("/users", (req, res, next) => {
+  console.log("Handling request under /users");
+  next();
+}, userRoutes);
 
-// ROUTES DECLARATION
-app.use("/", staticRoutes);
-app.use("/users", userRoutes);
 app.use("/notes", notesRoutes);
-app.use("/auth", authRoutes); // Use the correctly imported authRoutes
-
-// TEMPORARY ROUTE FOR TESTING SIGNIN LOGS
-app.post('/test-signin', async (req, res) => {
-  console.log("Hit the /test-signin route"); // ADDED LOG
-  await signin(req, res);
-  console.log("Finished executing signin function"); // ADDED LOG
-});
-
-// Swagger UI setup
+app.use("/auth", authRoutes);
+app.use("/", staticRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 export { app };
