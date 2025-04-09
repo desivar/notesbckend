@@ -1,75 +1,33 @@
-import Note from "../models/notes.model.js";
+import express from "express";
+import {
+  handleCreateNote,
+  handleDeleteNote,
+  handleGetAllNotes,
+  handleGetNoteById,
+  handleUpdateNote,
+  handleRenderEditNote,
+} from "../controllers/notes.controllers.js";
+import { authenticated } from "../middlewares/authenticated.js";
+import { setAuthStatus } from "../middlewares/setAuthStatus.js";
 
-// 👉 GET ALL NOTES CTRL
-export const handleGetAllNotes = async (req, res) => {
-  try {
-    const notes = await Note.find({ createdBy: req.user.userId });
-    res.render("notes", { notes, authenticated: req.isAuthenticated });
-  } catch (error) {
-    res.status(500).json({ msg: "Error fetching notes !!", error });
-  }
-};
+const router = express.Router();
 
-// 👉 GET SINGLE NOTE BY ID CTRL
-export const handleGetNoteById = async (req, res) => {
-  try {
-    const note = await Note.findById(req.params.noteId);
+// GET ALL NOTES        /notes
+router.get("/", authenticated, setAuthStatus, handleGetAllNotes);
 
-    if (!note) return res.status(404).json({ msg: "No note found !!" });
+// CREATE NEW NOTES     /notes/create
+router.post("/create", authenticated, handleCreateNote);
 
-    res.render("singleNote", { note });
-  } catch (error) {
-    res.status(500).json({ msg: "Error fetching notes !!", error });
-  }
-};
+//  GET NOTE BY ID       /notes/:noteId
+router.get("/:noteId", authenticated, handleGetNoteById);
 
-// 👉 CREATE A NEW NOTE CTRL
-export const handleCreateNote = async (req, res) => {
-  try {
-    const { title, description } = req.body;
+//  DELETE A NOTE        /notes/delete/:noteId
+router.get("/delete/:noteId", authenticated, handleDeleteNote);
 
-    if (!title || !description)
-      res.status(400).json({ msg: "All fields are required !!" });
+//  UPDATE A NOTE        /notes/edit/:noteId
+router.get("/edit/:noteId", authenticated, handleRenderEditNote);
 
-    await Note.create({
-      title,
-      description,
-      createdBy: req.user.userId,
-    });
+//  UPDATE A NOTE        /notes/edit/:noteId
+router.post("/edit/:noteId", authenticated, handleUpdateNote);
 
-    res.redirect("/notes");
-  } catch (error) {
-    res.status(500).json({ msg: "Error creating notes !!", error });
-  }
-};
-
-// 👉 DELETE NOTE CTRL
-export const handleDeleteNote = async (req, res) => {
-  try {
-    const note = await Note.findById(req.params.noteId);
-    if (!note) res.status(404).json({ msg: "No note found !!" });
-
-    await Note.findByIdAndDelete(req.params.noteId);
-    res.redirect("/notes");
-  } catch (error) {
-    res.status(500).json({ msg: "Error delete a notes !!", error });
-  }
-};
-
-// RENDER UPDATE PAGE
-export const handleRenderEditNote = async (req, res) => {
-  const note = await Note.findById(req.params.noteId);
-  if (!note) res.status(404).json({ msg: "No note found !!" });
-
-  res.render("editNote", { note });
-};
-
-//  UPDATE NOTE CTRL
-export const handleUpdateNote = async (req, res) => {
-  try {
-    await Note.findByIdAndUpdate(req.params.noteId, req.body, { new: true });
-    res.redirect("/notes");
-  } catch (error) {
-    res.status(500).json({ msg: "Error updating a note !!", error });
-  }
-};
+export default router;
