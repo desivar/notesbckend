@@ -7,6 +7,7 @@ import userRoutes from "./routes/users.routes.js";
 import notesRoutes from "./routes/notes.routes.js";
 import staticRoutes from "./routes/static.routes.js";
 import authRoutes from "./routes/authRoutes.js";
+import { signin } from './controllers/authController.js'; // TEMPORARY IMPORT
 
 const app = express(); // Declare and initialize 'app'
 
@@ -26,6 +27,11 @@ app.use("/", staticRoutes);
 app.use("/users", userRoutes);
 app.use("/notes", notesRoutes);
 app.use("/auth", authRoutes); // Use the correctly imported authRoutes
+
+// TEMPORARY ROUTE FOR TESTING SIGNIN LOGS
+app.post('/test-signin', async (req, res) => {
+  await signin(req, res);
+});
 
 // Swagger UI setup
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
