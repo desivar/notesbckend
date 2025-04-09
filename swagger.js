@@ -18,7 +18,7 @@ const doc = {
 };
 
 const outputFile = './swagger-output.json';
-const endpointsFiles = ['./routes/auth.js', './routes/users.routes.js', './routes/notes.routes.js', './routes/static.routes.js'];
+const endpointsFiles = ['./routes/authRoutes.js', './routes/users.routes.js', './routes/notes.routes.js', './routes/static.routes.js'];
 // Add paths to ALL your route files here
 
 swaggerAutogen(outputFile, endpointsFiles, doc);
