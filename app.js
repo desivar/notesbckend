@@ -6,7 +6,11 @@ import swaggerDocument from './swagger-output.json';
 import userRoutes from "./routes/users.routes.js";
 import notesRoutes from "./routes/notes.routes.js";
 import staticRoutes from "./routes/static.routes.js";
-import authRoutes from "./routes/authRoutes.js";
+import authRoutes from "./routes/authRoutes.js"; // Corrected import
+
+const app = express(); // Declare and initialize 'app'
+
+// SET TEMPLATE ENGINE AS EJS
 app.set("view engine", "ejs");
 
 // MIDDLEWARES
@@ -21,9 +25,9 @@ app.use(cookieParser());
 app.use("/", staticRoutes);
 app.use("/users", userRoutes);
 app.use("/notes", notesRoutes);
-app.use("/auth", authRoutes); // Mount your authentication routes
+app.use("/auth", authRoutes); // Use the correctly imported authRoutes
 
 // Swagger UI setup
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-export { app };
+export { app }; // Export 'app' after it has been defined
