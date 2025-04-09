@@ -1,12 +1,13 @@
-import express from "express";
-import path from "path";
-import cookieParser from "cookie-parser";
+// app.js
+import express from 'express';
+import path from 'path';
+import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger-output.json' with { type: 'json' };
-import userRoutes from "./routes/users.routes.js";
-import notesRoutes from "./routes/notes.routes.js";
-import staticRoutes from "./routes/static.routes.js";
-import authRoutes from "./routes/authRoutes.js";
+import userRoutes from './routes/users.routes.js';
+import notesRoutes from './routes/notes.routes.js';
+import staticRoutes from './routes/static.routes.js';
+import authRoutes from './routes/authRoutes.js';
 
 const app = express();
 
@@ -22,13 +23,11 @@ app.use(cookieParser());
 // Route mounting
 app.use("/", staticRoutes);
 app.use("/users", (req, res, next) => {
-  console.log("Handling request under /users");
+  console.log("Handling request under /users - From app.js");
   next();
 }, userRoutes);
 app.use("/notes", notesRoutes);
 app.use("/auth", authRoutes);
-
-// Swagger UI setup
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 export { app };
