@@ -1,60 +1,90 @@
-import User from "../models/users.model.js";
-import { authToken } from "../utils/authToken.js";
+// controllers/authController.js
+import User from '../models/users.model.js'; // Adjust the path to your User model
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { StatusCodes } from 'http-status-codes';
+import asyncHandler from 'express-async-handler'; // Optional: for cleaner async error handling
 
-// 👉 SIGNUP CONTROLLER
-export const handleUserSignup = async (req, res) => {
-  try {
-    const { fullName, email, password } = req.body;
+// @desc    Register a new user
+// @route   POST /api/auth/signup
+// @access  Public
+export const signup = asyncHandler(async (req, res) => {
+  const { fullName, email, password } = req.body;
 
-    if (!fullName || !email || !password)
-      return res.status(400).json({ msg: "All fields are required !!" });
+  // Basic validation
+  if (!fullName || !email || !password) {
+    res.status(StatusCodes.BAD_REQUEST);
+    throw new Error('Please provide all required fields');
+  }
 
-    // CHECK IF USER EXISTS
-    let user = await User.findOne({ email });
+  // Check if user exists
+  const userExists = await User.findOne({ email });
+  if (userExists) {
+    res.status(StatusCodes.CONFLICT);
+    throw new Error('User with this email already exists');
+  }
 
-    if (user) return res.status(400).json({ msg: "User already exists !!" });
+  // Hash password
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
 
-    user = await User.create({
-      fullName,
-      email,
-      password,
+  // Create user
+  const user = await User.create({
+    fullName,
+    email,
+    password: hashedPassword,
+  });
+
+  if (user) {
+    res.status(StatusCodes.CREATED).json({
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      token: generateToken(user._id), // Implement generateToken function
     });
-
-    // SENT AUTH TOKEN TO USER IN COOKIE
-    authToken(user._id, res);
-    res.redirect("/");
-  } catch (error) {
-    res.status(500).json({ msg: "Error creating user account !!", error });
+  } else {
+    res.status(StatusCodes.BAD_REQUEST);
+    throw new Error('Invalid user data');
   }
+});
+
+// @desc    Login user and return JWT
+// @route   POST /api/auth/signin
+// @access  Public
+export const signin = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  console.log("Signin attempt for email:", email); // ADDED LOG
+  const user = await User.findOne({ email });
+  console.log("User found during signin:", user); // ADDED LOG
+
+  if (user && (await bcrypt.compare(password, user.password))) {
+    console.log("bcrypt.compare result: true"); // ADDED LOG
+    res.json({
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      token: generateToken(user._id),
+    });
+  } else {
+    console.log("bcrypt.compare result: false OR user not found"); // ADDED LOG
+    res.status(StatusCodes.UNAUTHORIZED);
+    throw new Error('Invalid credentials');
+  }
+});
+
+// @desc    Logout user (client-side action - clear token)
+// @route   POST /api/auth/signout
+// @access  Public (or Protected depending on implementation)
+export const signout = (req, res) => {
+  // For JWT, the client typically handles token deletion.
+  // You might clear cookies or perform server-side session management here if used.
+  res.status(StatusCodes.OK).json({ message: 'Logged out successfully' });
 };
 
-// 👉 SIGNIN CONTROLLER
-export const handleUserSignin = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password)
-      return res.json({ msg: "All fields are required !!" });
-
-    const user = await User.findOne({ email });
-
-    if (!user || !(await user.comparePassword(password)))
-      return res.render("signin", { error: "Invalid email or password !!" });
-
-    // SENT AUTH TOKEN TO USER IN COOKIE
-    authToken(user._id, res);
-    res.redirect("/");
-  } catch (error) {
-    res.status(500).json({ msg: "Error signin user account !!", error });
-  }
-};
-
-// 👉 LOGOUT CONTROLLER
-export const handleUserLogout = async (req, res) => {
-  try {
-    res.clearCookie("token");
-    res.redirect("/sign-in");
-  } catch (error) {
-    res.status(500).json({ msg: "Error logout user account !!", error });
-  }
+const generateToken = (id) => {
+  console.log("JWT Secret:", process.env.JWT_SECRET); // ADDED LOG
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: '30d', // Example expiration
+  });
 };
