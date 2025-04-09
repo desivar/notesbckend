@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import swaggerUi from 'swagger-ui-express';
-import swaggerDocument from '../swagger-output.json'; // Adjust path as needed
+import swaggerDocument from './swagger-output.json';
 import userRoutes from "./routes/users.routes.js";
 import notesRoutes from "./routes/notes.routes.js";
 import staticRoutes from "./routes/static.routes.js";
