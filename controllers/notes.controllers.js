@@ -64,7 +64,7 @@ export const handleRenderEditNote = async (req, res) => {
   res.render("editNote", { note });
 };
 
-// 👉 UPDATE NOTE CTRL
+//  UPDATE NOTE CTRL
 export const handleUpdateNote = async (req, res) => {
   try {
     await Note.findByIdAndUpdate(req.params.noteId, req.body, { new: true });
